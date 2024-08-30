@@ -1,0 +1,1311 @@
+<html>
+    <head>
+        <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+        <title>Performance Benchmark for jck Applications</title>
+        <style>
+            html {
+                -webkit-print-color-adjust: exact;
+            }
+            * {
+                box-sizing: border-box;
+                -webkit-print-color-adjust: exact;
+            }
+
+            html,
+            body {
+                margin: 0;
+                padding: 0;
+            }
+            @media only screen {
+                body {
+                    /* margin: 2em auto; */
+                    margin: 0em auto;
+                    max-width: 1200px;
+                    color: rgb(55, 53, 47);
+                }
+            }
+            #groupA {
+                font-family: "Courier New", Courier, monospace;
+                white-space: pre; /* Preserves spacing */
+            }
+            body {
+                font-size: 17px;
+                line-height: 1.5;
+                white-space: pre-wrap;
+            }
+
+            a,
+            a.visited {
+                color: inherit;
+                text-decoration: underline;
+            }
+
+            .pdf-relative-link-path {
+                font-size: 80%;
+                color: #444;
+            }
+            
+            h1,
+            h2,
+            h3 {
+                letter-spacing: -0.01em;
+                line-height: 1.2;
+                font-weight: 600;
+                margin-bottom: 0;
+            }
+
+            .page-title {
+                font-size: 2.5rem;
+                font-weight: 700;
+                margin-top: 0;
+                margin-bottom: 0.0em;
+            }
+
+            h1 {
+                font-size: 1.75rem;
+                margin-top: 1.5rem;
+            }
+
+            h2 {
+                font-size: 1.75rem;
+                margin-top: 1.5rem;
+            }
+
+            h3 {
+                font-size: 1.5rem;
+                margin-top: 1.25rem;
+            }
+            button {
+            background-color: #4CAF50; /* Green background */
+            border: none;
+            color: white;
+            padding: 15px 32px; /* Button padding */
+            text-align: center;
+            text-decoration: none;
+            display: inline-block;
+            font-size: 20px; /* Increased font size */
+            margin: 4px 2px;
+            cursor: pointer;
+            border-radius: 8px; /* Rounded corners */
+            box-shadow: 0 4px #999; /* Adds a 3D shadow effect */
+        }
+
+        /* Add a hover effect for when the mouse is over the button */
+        button:hover {
+            background-color: #45a049; /* Slightly darker green */
+            box-shadow: 0 6px #666; /* Lift the shadow slightly */
+        }
+
+        /* When the button is pressed */
+        button:active {
+            background-color: #3e8e41;
+            box-shadow: 0 2px #666;
+            transform: translateY(4px); /* Pushes the button down slightly */
+        }
+            .source {
+                border: 1px solid #ddd;
+                border-radius: 3px;
+                padding: 1.5em;
+                word-break: break-all;
+            }
+
+            .callout {
+                border-radius: 3px;
+                padding: 1rem;
+            }
+
+            figure {
+                margin: 1.25em 0;
+                page-break-inside: avoid;
+            }
+
+            figcaption {
+                opacity: 0.5;
+                font-size: 85%;
+                margin-top: 0.5em;
+            }
+
+            mark {
+                background-color: transparent;
+            }
+
+            .indented {
+                padding-left: 1.5em;
+            }
+
+            hr {
+                background: transparent;
+                display: block;
+                width: 100%;
+                height: 1px;
+                visibility: visible;
+                border: none;
+                border-bottom: 1px solid rgba(55, 53, 47, 0.09);
+            }
+
+            img {
+                max-width: 100%;
+            }
+
+            @media only print {
+                img {
+                    max-height: 100vh;
+                    object-fit: contain;
+                }
+            }
+
+            @page {
+                margin: 1in;
+            }
+
+            .collection-content {
+                font-size: 0.875rem;
+            }
+
+            .column-list {
+                display: flex;
+                justify-content: space-between;
+            }
+
+            .column {
+                padding: 0 1em;
+            }
+
+            .column:first-child {
+                padding-left: 0;
+            }
+
+            .column:last-child {
+                padding-right: 0;
+            }
+
+            .table_of_contents-item {
+                display: block;
+                font-size: 0.875rem;
+                line-height: 1.3;
+                padding: 0.125rem;
+            }
+
+            .table_of_contents-indent-1 {
+                margin-left: 1.5rem;
+            }
+
+            .table_of_contents-indent-2 {
+                margin-left: 3rem;
+            }
+
+            .table_of_contents-indent-3 {
+                margin-left: 4.5rem;
+            }
+
+            .table_of_contents-link {
+                text-decoration: none;
+                opacity: 0.7;
+                border-bottom: 1px solid rgba(55, 53, 47, 0.18);
+            }
+            
+            .upload-section{
+                display: none;
+            }
+            
+            table,
+            th,
+            td {
+                border: 1px solid rgba(55, 53, 47, 0.09);
+                border-collapse: collapse;
+            }
+
+            table {
+                border-left: none;
+                border-right: none;
+            }
+
+            th,
+            td {
+                font-weight: normal;
+                padding: 0.25em 0.5em;
+                line-height: 1.5;
+                min-height: 1.5em;
+                text-align: left;
+            }
+
+            th {
+                color: rgba(55, 53, 47, 0.6);
+            }
+
+            ol,
+            ul {
+                margin: 0;
+                margin-block-start: 0.6em;
+                margin-block-end: 0.6em;
+            }
+
+            li > ol:first-child,
+            li > ul:first-child {
+                margin-block-start: 0.6em;
+            }
+
+            ul > li {
+                list-style: disc;
+            }
+
+            ul.to-do-list {
+                padding-inline-start: 0;
+            }
+
+            ul.to-do-list > li {
+                list-style: none;
+            }
+
+            .to-do-children-checked {
+                text-decoration: line-through;
+                opacity: 0.375;
+            }
+
+            ul.toggle > li {
+                list-style: none;
+            }
+
+            ul {
+                padding-inline-start: 1.7em;
+            }
+
+            ul > li {
+                padding-left: 0.1em;
+            }
+
+            ol {
+                padding-inline-start: 0.5em;
+                margin: 0.5em;
+            }
+            
+            ol > li {
+                margin: 0.5em;
+                padding-left: 0.2em;
+            }
+
+            .mono ol {
+                padding-inline-start: 2em;
+            }
+
+            .mono ol > li {
+                text-indent: -0.4em;
+            }
+
+            .toggle {
+                padding-inline-start: 0em;
+                list-style-type: none;
+            }
+
+            /* Indent toggle children */
+            .toggle > li > details {
+                padding-left: 1.7em;
+            }
+
+            .toggle > li > details > summary {
+                margin-left: -1.1em;
+            }
+
+            .selected-value {
+                display: inline-block;
+                padding: 0 0.5em;
+                background: rgba(206, 205, 202, 0.5);
+                border-radius: 3px;
+                margin-right: 0.5em;
+                margin-top: 0.3em;
+                margin-bottom: 0.3em;
+                white-space: nowrap;
+            }
+
+            .collection-title {
+                display: inline-block;
+                margin-right: 1em;
+            }
+
+            .page-description {
+                margin-bottom: 2em;
+            }
+
+            .simple-table {
+                margin-top: 1em;
+                font-size: 0.875rem;
+                empty-cells: show;
+            }
+            .simple-table td {
+                height: 29px;
+                min-width: 120px;
+            }
+
+            .simple-table th {
+                height: 29px;
+                min-width: 120px;
+            }
+
+            .simple-table-header-color {
+                background: rgb(247, 246, 243);
+                color: black;
+            }
+            .simple-table-header {
+                font-weight: 500;
+            }
+
+            time {
+                opacity: 0.5;
+            }
+
+            .icon {
+                display: inline-block;
+                max-width: 1.2em;
+                max-height: 1.2em;
+                text-decoration: none;
+                vertical-align: text-bottom;
+                margin-right: 0.5em;
+            }
+
+            img.icon {
+                border-radius: 3px;
+            }
+
+            .user-icon {
+                width: 1.5em;
+                height: 1.5em;
+                border-radius: 100%;
+                margin-right: 0.5rem;
+            }
+
+            .user-icon-inner {
+                font-size: 0.8em;
+            }
+
+            .text-icon {
+                border: 1px solid #000;
+                text-align: center;
+            }
+
+            .page-cover-image {
+                display: block;
+                object-fit: cover;
+                width: 100%;
+                max-height: 30vh;
+            }
+
+            .page-header-icon {
+                font-size: 3rem;
+                margin-bottom: 1rem;
+            }
+
+            .page-header-icon-with-cover {
+                margin-top: -0.72em;
+                margin-left: 0.07em;
+            }
+
+            .page-header-icon img {
+                border-radius: 3px;
+            }
+
+            .link-to-page {
+                margin: 1em 0;
+                padding: 0;
+                border: none;
+                font-weight: 500;
+            }
+
+            p > .user {
+                opacity: 0.5;
+            }
+
+            td > .user,
+            td > time {
+                white-space: nowrap;
+            }
+
+            input[type='checkbox'] {
+                transform: scale(1.5);
+                margin-right: 0.6em;
+                vertical-align: middle;
+            }
+
+            p {
+                margin-top: 0.5em;
+                margin-bottom: 0.5em;
+            }
+
+            .container {
+            width: 120%;
+            margin: 20px auto; 
+            padding: 20px;
+            background-color: #185eb325; /* 흰 배경색 */
+            border: 1px solid #c0bbbb; /* 옅은 테두리 */
+            border-radius: 10px; /* 둥근 모서리 */
+            box-shadow: 0 4px 8px rgba(10, 9, 1, 0.393); /* 그림자 효과 */
+            }
+
+            .image {
+                border: none;
+                margin: 1.5em 0;
+                padding: 0;
+                border-radius: 0;
+                text-align: center;
+            }
+
+            .code,
+            code {
+                background: rgba(135, 131, 120, 0.15);
+                border-radius: 3px;
+                padding: 0.2em 0.4em;
+                border-radius: 3px;
+                font-size: 85%;
+                tab-size: 2;
+            }
+
+            code {
+                color: #eb5757;
+            }
+
+            .code {
+                padding: 1.5em 1em;
+            }
+
+            .code-wrap {
+                white-space: pre-wrap;
+                word-break: break-all;
+            }
+
+            .code > code {
+                background: none;
+                padding: 0;
+                font-size: 100%;
+                color: inherit;
+            }
+
+            blockquote {
+                font-size: 1.25em;
+                margin: 1em 0;
+                padding-left: 1em;
+                border-left: 3px solid rgb(55, 53, 47);
+            }
+
+            .bookmark {
+                text-decoration: none;
+                max-height: 8em;
+                padding: 0;
+                display: flex;
+                width: 100%;
+                align-items: stretch;
+            }
+
+            .bookmark-title {
+                font-size: 0.85em;
+                overflow: hidden;
+                text-overflow: ellipsis;
+                height: 1.75em;
+                white-space: nowrap;
+            }
+
+            .bookmark-text {
+                display: flex;
+                flex-direction: column;
+            }
+
+            .bookmark-info {
+                flex: 4 1 180px;
+                padding: 12px 14px 14px;
+                display: flex;
+                flex-direction: column;
+                justify-content: space-between;
+            }
+
+            .bookmark-image {
+                width: 33%;
+                flex: 1 1 180px;
+                display: block;
+                position: relative;
+                object-fit: cover;
+                border-radius: 1px;
+            }
+
+            .bookmark-description {
+                color: rgba(55, 53, 47, 0.6);
+                font-size: 0.75em;
+                overflow: hidden;
+                max-height: 4.5em;
+                word-break: break-word;
+            }
+
+            .bookmark-href {
+                font-size: 0.75em;
+                margin-top: 0.25em;
+            }
+
+            .sans {
+                font-family: ui-sans-serif, -apple-system, BlinkMacSystemFont,
+                    'Segoe UI Variable Display', 'Segoe UI', Helvetica, 'Apple Color Emoji', Arial,
+                    sans-serif, 'Segoe UI Emoji', 'Segoe UI Symbol';
+            }
+            .code {
+                font-family: 'SFMono-Regular', Menlo, Consolas, 'PT Mono', 'Liberation Mono',
+                    Courier, monospace;
+            }
+            .serif {
+                font-family: Lyon-Text, Georgia, ui-serif, serif;
+            }
+            .mono {
+                font-family: iawriter-mono, Nitti, Menlo, Courier, monospace;
+            }
+            .pdf .sans {
+                font-family: Inter, ui-sans-serif, -apple-system, BlinkMacSystemFont,
+                    'Segoe UI Variable Display', 'Segoe UI', Helvetica, 'Apple Color Emoji', Arial,
+                    sans-serif, 'Segoe UI Emoji', 'Segoe UI Symbol', 'Twemoji', 'Noto Color Emoji',
+                    'Noto Sans CJK JP';
+            }
+            .pdf:lang(zh-CN) .sans {
+                font-family: Inter, ui-sans-serif, -apple-system, BlinkMacSystemFont,
+                    'Segoe UI Variable Display', 'Segoe UI', Helvetica, 'Apple Color Emoji', Arial,
+                    sans-serif, 'Segoe UI Emoji', 'Segoe UI Symbol', 'Twemoji', 'Noto Color Emoji',
+                    'Noto Sans CJK SC';
+            }
+            .pdf:lang(zh-TW) .sans {
+                font-family: Inter, ui-sans-serif, -apple-system, BlinkMacSystemFont,
+                    'Segoe UI Variable Display', 'Segoe UI', Helvetica, 'Apple Color Emoji', Arial,
+                    sans-serif, 'Segoe UI Emoji', 'Segoe UI Symbol', 'Twemoji', 'Noto Color Emoji',
+                    'Noto Sans CJK TC';
+            }
+            .pdf:lang(ko-KR) .sans {
+                font-family: Inter, ui-sans-serif, -apple-system, BlinkMacSystemFont,
+                    'Segoe UI Variable Display', 'Segoe UI', Helvetica, 'Apple Color Emoji', Arial,
+                    sans-serif, 'Segoe UI Emoji', 'Segoe UI Symbol', 'Twemoji', 'Noto Color Emoji',
+                    'Noto Sans CJK KR';
+            }
+            .pdf .code {
+                font-family: Source Code Pro, 'SFMono-Regular', Menlo, Consolas, 'PT Mono',
+                    'Liberation Mono', Courier, monospace, 'Twemoji', 'Noto Color Emoji',
+                    'Noto Sans Mono CJK JP';
+            }
+            .pdf:lang(zh-CN) .code {
+                font-family: Source Code Pro, 'SFMono-Regular', Menlo, Consolas, 'PT Mono',
+                    'Liberation Mono', Courier, monospace, 'Twemoji', 'Noto Color Emoji',
+                    'Noto Sans Mono CJK SC';
+            }
+            .pdf:lang(zh-TW) .code {
+                font-family: Source Code Pro, 'SFMono-Regular', Menlo, Consolas, 'PT Mono',
+                    'Liberation Mono', Courier, monospace, 'Twemoji', 'Noto Color Emoji',
+                    'Noto Sans Mono CJK TC';
+            }
+            .pdf:lang(ko-KR) .code {
+                font-family: Source Code Pro, 'SFMono-Regular', Menlo, Consolas, 'PT Mono',
+                    'Liberation Mono', Courier, monospace, 'Twemoji', 'Noto Color Emoji',
+                    'Noto Sans Mono CJK KR';
+            }
+            .pdf .serif {
+                font-family: PT Serif, Lyon-Text, Georgia, ui-serif, serif, 'Twemoji',
+                    'Noto Color Emoji', 'Noto Serif CJK JP';
+            }
+            .pdf:lang(zh-CN) .serif {
+                font-family: PT Serif, Lyon-Text, Georgia, ui-serif, serif, 'Twemoji',
+                    'Noto Color Emoji', 'Noto Serif CJK SC';
+            }
+            .pdf:lang(zh-TW) .serif {
+                font-family: PT Serif, Lyon-Text, Georgia, ui-serif, serif, 'Twemoji',
+                    'Noto Color Emoji', 'Noto Serif CJK TC';
+            }
+            .pdf:lang(ko-KR) .serif {
+                font-family: PT Serif, Lyon-Text, Georgia, ui-serif, serif, 'Twemoji',
+                    'Noto Color Emoji', 'Noto Serif CJK KR';
+            }
+            .pdf .mono {
+                font-family: PT Mono, iawriter-mono, Nitti, Menlo, Courier, monospace, 'Twemoji',
+                    'Noto Color Emoji', 'Noto Sans Mono CJK JP';
+            }
+            .pdf:lang(zh-CN) .mono {
+                font-family: PT Mono, iawriter-mono, Nitti, Menlo, Courier, monospace, 'Twemoji',
+                    'Noto Color Emoji', 'Noto Sans Mono CJK SC';
+            }
+            .pdf:lang(zh-TW) .mono {
+                font-family: PT Mono, iawriter-mono, Nitti, Menlo, Courier, monospace, 'Twemoji',
+                    'Noto Color Emoji', 'Noto Sans Mono CJK TC';
+            }
+            .pdf:lang(ko-KR) .mono {
+                font-family: PT Mono, iawriter-mono, Nitti, Menlo, Courier, monospace, 'Twemoji',
+                    'Noto Color Emoji', 'Noto Sans Mono CJK KR';
+            }
+            .highlight-default {
+                color: rgba(55, 53, 47, 1);
+            }
+            .highlight-gray {
+                color: rgba(120, 119, 116, 1);
+                fill: rgba(120, 119, 116, 1);
+            }
+            .highlight-brown {
+                color: rgba(159, 107, 83, 1);
+                fill: rgba(159, 107, 83, 1);
+            }
+            .highlight-orange {
+                color: rgba(217, 115, 13, 1);
+                fill: rgba(217, 115, 13, 1);
+            }
+            .highlight-yellow {
+                color: rgba(203, 145, 47, 1);
+                fill: rgba(203, 145, 47, 1);
+            }
+            .highlight-teal {
+                color: rgba(68, 131, 97, 1);
+                fill: rgba(68, 131, 97, 1);
+            }
+            .highlight-blue {
+                color: rgba(51, 126, 169, 1);
+                fill: rgba(51, 126, 169, 1);
+            }
+            .highlight-purple {
+                color: rgba(144, 101, 176, 1);
+                fill: rgba(144, 101, 176, 1);
+            }
+            .highlight-pink {
+                color: rgba(193, 76, 138, 1);
+                fill: rgba(193, 76, 138, 1);
+            }
+            .highlight-red {
+                color: rgba(212, 76, 71, 1);
+                fill: rgba(212, 76, 71, 1);
+            }
+            .highlight-default_background {
+                color: rgba(55, 53, 47, 1);
+            }
+            .highlight-gray_background {
+                background: rgba(241, 241, 239, 1);
+            }
+            .highlight-brown_background {
+                background: rgba(244, 238, 238, 1);
+            }
+            .highlight-orange_background {
+                background: rgba(251, 236, 221, 1);
+            }
+            .highlight-yellow_background {
+                background: rgba(251, 237, 214, 1);
+            }
+            .highlight-teal_background {
+                background: rgba(237, 243, 236, 1);
+            }
+            .highlight-blue_background {
+                background: rgba(231, 243, 248, 1);
+            }
+            .highlight-purple_background {
+                background: rgba(244, 240, 247, 0.8);
+            }
+            .highlight-pink_background {
+                background: rgba(249, 238, 243, 0.8);
+            }
+            .highlight-red_background {
+                background: rgba(253, 235, 236, 1);
+            }
+            .block-color-default {
+                color: inherit;
+                fill: inherit;
+            }
+            .block-color-gray {
+                color: rgba(120, 119, 116, 1);
+                fill: rgba(120, 119, 116, 1);
+            }
+            .block-color-brown {
+                color: rgba(159, 107, 83, 1);
+                fill: rgba(159, 107, 83, 1);
+            }
+            .block-color-orange {
+                color: rgba(217, 115, 13, 1);
+                fill: rgba(217, 115, 13, 1);
+            }
+            .block-color-yellow {
+                color: rgba(203, 145, 47, 1);
+                fill: rgba(203, 145, 47, 1);
+            }
+            .block-color-teal {
+                color: rgba(68, 131, 97, 1);
+                fill: rgba(68, 131, 97, 1);
+            }
+            .block-color-blue {
+                color: rgba(51, 126, 169, 1);
+                fill: rgba(51, 126, 169, 1);
+            }
+            .block-color-purple {
+                color: rgba(144, 101, 176, 1);
+                fill: rgba(144, 101, 176, 1);
+            }
+            .block-color-pink {
+                color: rgba(193, 76, 138, 1);
+                fill: rgba(193, 76, 138, 1);
+            }
+            .block-color-red {
+                color: rgba(212, 76, 71, 1);
+                fill: rgba(212, 76, 71, 1);
+            }
+            .block-color-default_background {
+                color: inherit;
+                fill: inherit;
+            }
+            .block-color-gray_background {
+                background: rgba(241, 241, 239, 1);
+            }
+            .block-color-brown_background {
+                background: rgba(244, 238, 238, 1);
+            }
+            .block-color-orange_background {
+                background: rgba(251, 236, 221, 1);
+            }
+            .block-color-yellow_background {
+                background: rgba(251, 237, 214, 1);
+            }
+            .block-color-teal_background {
+                background: rgba(237, 243, 236, 1);
+            }
+            .block-color-blue_background {
+                background: rgba(231, 243, 248, 1);
+            }
+            .block-color-purple_background {
+                background: rgba(244, 240, 247, 0.8);
+            }
+            .block-color-pink_background {
+                background: rgba(249, 238, 243, 0.8);
+            }
+            .block-color-red_background {
+                background: rgba(253, 235, 236, 1);
+            }
+            .select-value-color-uiBlue {
+                background-color: rgba(35, 131, 226, 0.07);
+            }
+            .select-value-color-pink {
+                background-color: rgba(245, 224, 233, 1);
+            }
+            .select-value-color-purple {
+                background-color: rgba(232, 222, 238, 1);
+            }
+            .select-value-color-green {
+                background-color: rgba(219, 237, 219, 1);
+            }
+            .select-value-color-gray {
+                background-color: rgba(227, 226, 224, 1);
+            }
+            .select-value-color-transparentGray {
+                background-color: rgba(227, 226, 224, 0);
+            }
+            .select-value-color-translucentGray {
+                background-color: rgba(0, 0, 0, 0.06);
+            }
+            .select-value-color-orange {
+                background-color: rgba(250, 222, 201, 1);
+            }
+            .select-value-color-brown {
+                background-color: rgba(238, 224, 218, 1);
+            }
+            .select-value-color-red {
+                background-color: rgba(255, 226, 221, 1);
+            }
+            .select-value-color-yellow {
+                background-color: rgba(249, 228, 188, 1);
+            }
+            .select-value-color-blue {
+                background-color: rgba(211, 229, 239, 1);
+            }
+            .select-value-color-pageGlass {
+                background-color: undefined;
+            }
+            .select-value-color-washGlass {
+                background-color: undefined;
+            }
+
+            .checkbox {
+                display: inline-flex;
+                vertical-align: text-bottom;
+                width: 16;
+                height: 16;
+                background-size: 16px;
+                margin-left: 2px;
+                margin-right: 5px;
+            }
+
+            .checkbox-on {
+                background-image: url('data:image/svg+xml;charset=UTF-8,%3Csvg%20width%3D%2216%22%20height%3D%2216%22%20viewBox%3D%220%200%2016%2016%22%20fill%3D%22none%22%20xmlns%3D%22http%3A%2F%2Fwww.w3.org%2F2000%2Fsvg%22%3E%0A%3Crect%20width%3D%2216%22%20height%3D%2216%22%20fill%3D%22%2358A9D7%22%2F%3E%0A%3Cpath%20d%3D%22M6.71429%2012.2852L14%204.9995L12.7143%203.71436L6.71429%209.71378L3.28571%206.2831L2%207.57092L6.71429%2012.2852Z%22%20fill%3D%22white%22%2F%3E%0A%3C%2Fsvg%3E');
+            }
+
+            .checkbox-off {
+                background-image: url('data:image/svg+xml;charset=UTF-8,%3Csvg%20width%3D%2216%22%20height%3D%2216%22%20viewBox%3D%220%200%2016%2016%22%20fill%3D%22none%22%20xmlns%3D%22http%3A%2F%2Fwww.w3.org%2F2000%2Fsvg%22%3E%0A%3Crect%20x%3D%220.75%22%20y%3D%220.75%22%20width%3D%2214.5%22%20height%3D%2214.5%22%20fill%3D%22white%22%20stroke%3D%22%2336352F%22%20stroke-width%3D%221.5%22%2F%3E%0A%3C%2Fsvg%3E');
+            }
+        </style>
+        <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+    </head>
+    <body><article id="cc0f906e-cd77-421a-9353-662636085cb7" class="page sans">  
+            <div class="container"><div class="page-body" style="white-space: normal">
+                <h1 class="page-title">Performance Benchmark for jck Applications</h1>
+                <p class="page-description"></p>
+                <p id="c92940ef-1fea-4b39-8f2b-be52fb79e6db" class=""><b>Contact: Jeongwon Seo (seo71@purdue.edu)</b></p>
+                <h3 id="163e996d-6683-4750-b0a2-63dc11a32cf7" class="">Objective</h3>
+                <p id="c92940ef-1fea-4b39-8f2b-be52fb79e6db" class="">
+                    One of the most crucial aspects of model validation is conducting experiments that align with simulations 
+                    of the implemented model/system(s). 
+                    To reduce the associated costs and infer the additional information that new experiments might contribute to the application,
+                    the ACCRUE index was previously proposed. Therefore, the objective of this project is to develop confidence 
+                    in data assimilation (DA) techniques by employing three distinct sorting schemes. Experiments were sorted 
+                    in ascending and descending order using the ck metric, while the most recent methodology, jk, 
+                    was used to achieve optimal sorting. The results obtained from experiments sorted by different methods 
+                    allow for a comparison between traditional ck-based sorting and the newer jk-based sorting approach.
+                </p><br>
+                <!-- <h3 id="e386931e-871c-4d1a-90dc-637d817a0096" class="">Scope</h3>
+                <p id="abb06fcb-f605-4460-bb4f-b19c514c5d0f" class="">
+                    The activity consists of ...
+                </p><br> -->
+                <h3 id="5815b41f-9be7-4654-ab8e-0ba15f27064d" class="">Description</h3>
+                <p id="fed9338a-4436-4f46-84c2-fe4c8a590e9e" class="">
+                    This exercise is designed to perform DA using deterministic, stochastic, or mixed modes. 
+                    DA is performed on a single application using available experiments (a single or multiple). 
+                    If a deterministic mode is chosen, 
+                    the mean and covariance CSV files are used. 
+                    The size of the mean and covariance for the simulation information is <i>N<sub>e</sub></i>+1 and <i>N<sub>e</sub></i>+1 by <i>N<sub>e</sub></i>+1, respectively. 
+                    On the other hand, the size of the mean and covariance for the measurement information is <i>N<sub>e</sub></i> and <i>N<sub>e</sub></i> by <i>N<sub>e</sub></i>, respectively, 
+                    since the application has no measurement. 
+                    Additionally, users can select the stochastic mode by specifying the desired number of samples. 
+                    To obtain statistically stable results, at least 300 samples are recommended, 
+                    though having more than 1000 would be ideal. 
+                    When choosing the stochastic mode, a file with a size of <i>N<sub>s</sub></i> by <i>N<sub>e</sub></i>+1 is for simulation information, 
+                    and a CSV file with a size of <i>N<sub>s</sub></i> by <i>N<sub>e</sub></i> is uploaded for measurement information. 
+                    (<i>N<sub>e</sub></i> : Number of experiments, <i>N<sub>s</sub></i> : Number of samples) 
+                </p><br>
+                <h3 id="ad7ab889-21cf-4f2b-a6f6-dded90fbdbab" class="">
+                    Expected Results and Deliverables
+                </h3>
+                <p id="b27c57a7-1448-4a5b-9261-be8fd09ed0d1" class="">
+                    Once the files are successfully uploaded, participants can download both a PNG file 
+                    representing the graph of the results and a CSV file containing the data corresponding to the table. 
+                    The graph and table display the results of the DA process as experiments are added in an incremental manner 
+                    by three different sorting methods. 
+                    The data point at index 0 on x-axis of the graph, as well as the first row of the table (excluding the header), 
+                    where the number of experiments is zero, represents the prior information of the application, 
+                    i.e., the mean and standard deviation. 
+                    Since no experiments are used at this point, the results should be identical regardless of the sorting method. 
+                    Subsequently, as experiments are included in the DA calculation process according to the sorting method, 
+                    the updated application information is recorded. 
+                    The final DA result, after all experiments have been utilized, is the same regardless of the sorting method. 
+                    Hence, the data points at the last index of the graph and the last row of the table are identical 
+                    across all methods. The downloaded CSV file consists of six columns: 
+                    odd-numbered columns represent the keff mean, while even-numbered columns represent the keff uncertainty. 
+                    Columns 1 and 2 show the results from ck-ascending sorting, 
+                    where experiments are sorted from the smallest to the largest ck value; 
+                    columns 3 and 4 correspond to ck-descending sorting, the reverse order; 
+                    and finally, columns 5 and 6 correspond to optimal sorting using jk, as proposed in the ACCURE paper.
+                </p><br>
+                <br />
+                <hr id="68e9b9c4-8c30-4722-9eff-cccce4abc927" />
+                <h2 id="99b4fae5-dc45-47b7-b0c1-2739feefdf60" class="">Instructions</h2><br>
+                The process of practicing DA using three different sorting methods on this website can be broadly divided into three main steps:
+                <p id="fed9338a-4436-4f46-84c2-fe4c8a590e9e" class="">
+                    <ol>
+                        <li><b>File preparation</b></li>
+                        Participants can prepare their data/files using one of the following methods:
+                        <ol type="a">
+                            <li>Demo files - Information on 10 experiments and an application model from the ICSBEP handbook has been pre-saved. You can download the files by clicking the links in the 'Demo Files' section below.</li>
+                            <li>ICSBEP handbook benchmarks - Participants can select experiments and an application from a total of 425 critical benchmarks. After selecting all benchmarks for both the experiments and the application, click the 'Selection complete' button to choose one application from the selected benchmarks. Once the application is chosen, you can download the simulation keff mean, measurement keff mean, simulation keff covariance, and measurement keff covariance using the four buttons below. </li>
+                            <li>Participants can prepare their own files/data. However, be mindful of the difference in data size between simulation and measurement information depending on whether an application is involved. For more information on file sizes, refer to the 'Description' section above.</li>
+                        </ol>
+                        <li><b>Upload files</b></li>
+                        Participants can determine the appropriate file mode for performing DA based on their available data. Please use the dropdown feature next to 'Select an option' in the 'Upload CSV File' section to choose the mode.
+                        <ol type="a">
+                            <li>Deterministic mode - To perform DA in this mode, two files are required: one containing the keff mean values and another containing the keff covariance. If both simulation and measurement information are to be uploaded in deterministic mode, a total of four files will be needed. Please ensure that the CSV file containing the mean values is a column vector. Additionally, if the provided covariance is not positive semi-definite, errors may occur during the calculation process.</li>
+                            <li>Stochastic mode - DA can be calculated based on samples, as the keff mean and covariance can also be derived from samples. If you wish to use stochastic mode, upload files containing the samples corresponding to the simulation and measurement information. Each column in the sample files must form a column vector representing the samples for the respective experiment/application. Therefore, the files should be sized <i>N<sub>s</sub></i> by <i>N<sub>e</sub></i>+1 for simulation information or <i>N<sub>s</sub></i> by <i>N<sub>e</sub></i> for measurement information.</li>
+                            <li>Mixed mode - It is possible to use deterministic and stochastic modes interchangeably. Depending on the participant’s preference, simulation information can be uploaded in deterministic mode while measurement information is uploaded in stochastic mode, or vice versa.</li>
+                        </ol>
+                        <li><b>Download results</b></li>
+                        Participants can view the results in both graph and table formats, and download them for further analysis or future research. These functions become available after providing the correct files and clicking the 'Upload and Process' button. Once activated, by clicking the 'Download Graph' and 'Download Data' buttons, the graph will be saved in PNG format, and the table will be provided as a CSV file.
+                    </ol>
+                </p>
+                
+                <p id="a1a13024-437e-415e-8fc6-99cafadf6f82" class=""></p>
+                <br />
+                <hr id="68e9b9c4-8c30-4722-9eff-cccce4abc927" />
+                <h2 id="5815b41f-9be7-4654-ab8e-0ba15f27064d" class="">Demo Files</h2>
+                
+                <p id="fed9338a-4436-4f46-84c2-fe4c8a590e9e" class="">
+                    Demo files is provided for practice purpose. 
+                    The data includes 10 randomly selected experiments and one application from the ICSBEP handbook criticality benchmarks. 
+                    Both the simulation information and measurement information can be uploaded in either deterministic or stochastic mode (interchangeable). 
+                    The number of samples used in the stochastic mode for both simulation and measurement modes is 10,000.
+                </p>
+                <ul id="5c0b14e9-b212-4346-8545-8c40930d09e2" class="bulleted-list">
+                    <li style="list-style-type: disc">
+                        For Deterministic mode, 
+                        <a href="{{url_for('download_demo_mu_c')}}">simulation means</a>, 
+                        <a href="{{url_for('download_demo_Sig_c')}}">simulation covariance</a>, 
+                        <a href="{{url_for('download_demo_mu_e')}}">measurement means</a>, and
+                        <a href="{{url_for('download_demo_Sig_e')}}">measurement covariance</a>
+                    </li>
+                </ul>
+                <ul id="5c0b14e9-b212-4346-8545-8c40930d09e2" class="bulleted-list">
+                    <li style="list-style-type: disc">
+                        For Stochastic mode, 
+                        <a href="{{url_for('download_demo_simul_sample')}}">simulation samples</a>, and
+                        <a href="{{url_for('download_demo_meas_sample')}}">measurement samples</a>
+                        </li>
+                </ul>
+                <br>
+                <p id="a9ec1659-8701-41ac-b5e2-42730ceb082b" class=""></p>
+                <p id="a9ec1659-8701-41ac-b5e2-42730ceb082b" class=""></p>
+                <hr id="68e9b9c4-8c30-4722-9eff-cccce4abc927" />
+                <p id="8fd2cd5d-0de4-4707-b37c-80edad8de392" class=""></p>
+                <h2 id="afa7723d-0f4a-4933-939b-de819102a0d5" class="">Benchmark Data Generation from ICSBEP Handbook</h2>
+                
+                <p id="fed9338a-4436-4f46-84c2-fe4c8a590e9e" class="">
+                    In addition to the demo files, participants can download the necessary files by using the full set of 425 available critical benchmarks from the ICSBEP handbook. The benchmarks' information (simulation and measurement data) is provided below for participants to review and select. Additionally, the 'score' is specified, which is defined as the difference between the calculated and measured values divided by the square sum of their uncertainties. This score indicates whether the simulation results and the measurement data fall within the statistical distribution.
+                <br><br>
+                <form>
+                    <label for="groupA">Select benchmarks for both Experiment(s) and Application (Ctrl or Shift to select multiple):</label><br>
+                    <select id="groupA" name="groupA[]" size="10" multiple>
+                        {% for item in items %}
+                            <option value="{{ loop.index0 }}">{{ item }}</option>
+                        {% endfor %}
+                    </select><br><br>
+                    
+                    Upon completion of selection, please click "Seleciton complete" button to further select Application<br>
+                    <button type="button" onclick="updateGroupB()">Selection complete</button><br><br>
+                    
+                    <label for="groupB">Select a single benchmark as Application:</label><br>
+                    <select id="groupB" name="groupB" disabled></select><br><br>
+                    
+                    <button type="button" onclick="download_calc_keff()">Download Simulation keff</button>
+                    <button type="button" onclick="download_meas_keff()">Download Measurement keff</button>
+                    <button type="button" onclick="download_calc_cov()">Download Simulation Covariance</button>
+                    <button type="button" onclick="download_meas_cov()">Download Measurement Covariance</button>
+                </form>
+                <br><br>
+                </p>
+
+                <hr id="68e9b9c4-8c30-4722-9eff-cccce4abc927" />
+                <h2 id="afa7723d-0f4a-4933-939b-de819102a0d5" class="">Upload CSV File</h2>
+                <div id="2509fd8d-3a2a-46d1-9d76-77351161bb13" class="column-list">
+                    <div id="dfd28b4b-8734-445d-96ac-7c0fe2efa832" style="width: 50%" class="column">
+                        <h3 id="8ee96f12-60ef-4123-aea1-4f9c48823235" class=""> Simulation information </h3>
+                        <br>
+                        <form id="simulation-form" method="post" enctype="multipart/form-data">
+                            <label for="simulation-options">Select an option:</label>
+                            <select id="simulation-options" name="simulation-options" onchange="showSimulationUploadFields()">
+                                <option value="">--Please choose an option--</option>
+                                <option value="deterministic">Deterministic</option>
+                                <option value="stochastic">Stochastic</option>
+                            </select>
+                            <div id="simulation-deterministic-upload" class="upload-section">
+                                <p>Upload mean vector, &#956<sub>c</sub>:</p>
+                                <input type="file" name="mu_c" id="mu_c">
+                                <p>Upload calculated covariance, &#931<sub>c</sub>:</p>
+                                <input type="file" name="sigma_c" id="sigma_c">
+                            </div>
+                            <div id="simulation-stochastic-upload" class="upload-section">
+                                <p>Upload simulation samples:</p>
+                                <input type="file" name="calc_sample" id="calc_sample">
+                            </div>
+                        </form>
+                    </div>
+                    
+                    <div id="86303e85-5fec-4f35-938c-c3e464d85367" style="width: 50%" class="column" >
+                        <h3 id="68e54dc2-6eff-45b1-a2e7-2dc628dd9c7c" class=""> Measurement information </h3>
+                        <br>
+                        <form id="measurement-form" method="post" enctype="multipart/form-data">
+                            <label for="measurement-options">Select an option:</label>
+                            <select id="measurement-options" name="measurement-options" onchange="showMeasurementUploadFields()">
+                                <option value="">--Please choose an option--</option>
+                                <option value="deterministic">Deterministic</option>
+                                <option value="stochastic">Stochastic</option>
+                            </select>
+                            <div id="measurement-deterministic-upload" class="upload-section">
+                                <p>Upload mean vector, &#956<sub>e</sub>:</p>
+                                <input type="file" name="mu_e" id="mu_e">
+                                <p>Upload calculated covariance, &#931<sub>e</sub>:</p>
+                                <input type="file" name="sigma_e" id="sigma_e">
+                            </div>
+                            <div id="measurement-stochastic-upload" class="upload-section">
+                                <p>Upload measurement samples:</p>
+                                <input type="file" name="meas_sample" id="meas_sample">
+                            </div>
+                            
+                        </form>
+                    </div>
+                </div>
+                <script>
+                    let selectedIndices = [];
+                    let selectedItems = [];
+
+                    function updateGroupB() {
+                        const groupASelect = document.getElementById('groupA');
+                        const selectedOptions = Array.from(groupASelect.selectedOptions);
+
+                        // Store selected indices and items from Group A
+                        selectedIndices = selectedOptions.map(option => parseInt(option.value));
+                        selectedItems = selectedOptions.map(option => option.text);  // Save the text of selected options
+
+                        // Populate Group B options with selected Group A items
+                        const groupBSelect = document.getElementById('groupB');
+                        groupBSelect.innerHTML = ''; // Clear previous options
+
+                        selectedItems.forEach((item, index) => {
+                            const newOption = document.createElement('option');
+                            newOption.value = selectedIndices[index];  // Store the corresponding index as value
+                            newOption.text = item;  // Display the item text
+                            groupBSelect.add(newOption);
+                        });
+
+                        // Make sure that Group B is visible only if Group A has selected items
+                        if (selectedIndices.length > 0) {
+                            groupBSelect.disabled = false;
+                        }
+                    }
+
+                    function download_calc_keff() {
+                        const groupBSelect = document.getElementById('groupB');
+                        selectedGroupBIndex = parseInt(groupBSelect.value);
+
+                        selectedIndices = selectedIndices.filter(index => index !== selectedGroupBIndex);
+                        selectedIndices.push(selectedGroupBIndex); // Group B index is added to the end
+
+                        fetch('/download_calc_keff', {
+                            method: 'POST',
+                            headers: {
+                                'Content-Type': 'application/json',
+                            },
+                            body: JSON.stringify({ indices: selectedIndices })
+                        })
+                        .then(response => response.blob())
+                        .then(blob => {
+                            const url = window.URL.createObjectURL(new Blob([blob]));
+                            const a = document.createElement('a');
+                            a.href = url;
+                            a.download = 'selected_calc_keff.csv';
+                            document.body.appendChild(a);
+                            a.click();
+                            a.remove();
+                        })
+                        .catch(error => console.error('Error:', error));
+                    }
+                
+                    function download_meas_keff() {
+                        const groupBSelect = document.getElementById('groupB');
+                        selectedGroupBIndex = parseInt(groupBSelect.value);
+
+                        selectedIndices = selectedIndices.filter(index => index !== selectedGroupBIndex);
+                        selectedIndices.push(selectedGroupBIndex); // Group B index is added to the end
+
+                        fetch('/download_meas_keff', {
+                            method: 'POST',
+                            headers: {
+                                'Content-Type': 'application/json',
+                            },
+                            body: JSON.stringify({ indices: selectedIndices })
+                        })
+                        .then(response => response.blob())
+                        .then(blob => {
+                            const url = window.URL.createObjectURL(new Blob([blob]));
+                            const a = document.createElement('a');
+                            a.href = url;
+                            a.download = 'selected_meas_keff.csv';
+                            document.body.appendChild(a);
+                            a.click();
+                            a.remove();
+                        })
+                        .catch(error => console.error('Error:', error));
+                    }
+
+                    function download_calc_cov() {
+                        const groupBSelect = document.getElementById('groupB');
+                        selectedGroupBIndex = parseInt(groupBSelect.value);
+
+                        selectedIndices = selectedIndices.filter(index => index !== selectedGroupBIndex);
+                        selectedIndices.push(selectedGroupBIndex); 
+
+                        fetch('/download_calc_cov', {
+                            method: 'POST',
+                            headers: {
+                                'Content-Type': 'application/json',
+                            },
+                            body: JSON.stringify({ indices: selectedIndices })
+                        })
+                        .then(response => response.blob())
+                        .then(blob => {
+                            const url = window.URL.createObjectURL(new Blob([blob]));
+                            const a = document.createElement('a');
+                            a.href = url;
+                            a.download = 'selected_calc_cov.csv';
+                            document.body.appendChild(a);
+                            a.click();
+                            a.remove();
+                        })
+                        .catch(error => console.error('Error:', error));
+                    }
+
+                    function download_meas_cov() {
+                        const groupBSelect = document.getElementById('groupB');
+                        selectedGroupBIndex = parseInt(groupBSelect.value);
+
+                        selectedIndices = selectedIndices.filter(index => index !== selectedGroupBIndex);
+                        selectedIndices.push(selectedGroupBIndex); 
+
+                        fetch('/download_meas_cov', {
+                            method: 'POST',
+                            headers: {
+                                'Content-Type': 'application/json',
+                            },
+                            body: JSON.stringify({ indices: selectedIndices })
+                        })
+                        .then(response => response.blob())
+                        .then(blob => {
+                            const url = window.URL.createObjectURL(new Blob([blob]));
+                            const a = document.createElement('a');
+                            a.href = url;
+                            a.download = 'selected_meas_cov.csv';
+                            document.body.appendChild(a);
+                            a.click();
+                            a.remove();
+                        })
+                        .catch(error => console.error('Error:', error));
+                    }
+
+                function showSimulationUploadFields() {
+                    var selection = document.getElementById("simulation-options").value;
+                    document.getElementById("simulation-deterministic-upload").style.display = "none";
+                    document.getElementById("simulation-stochastic-upload").style.display = "none";
+
+                    if (selection === "deterministic") {
+                        document.getElementById("simulation-deterministic-upload").style.display = "block";
+                    } else if (selection === "stochastic") {
+                        document.getElementById("simulation-stochastic-upload").style.display = "block";
+                    }
+                }
+
+                function showMeasurementUploadFields() {
+                    var selection = document.getElementById("measurement-options").value;
+                    document.getElementById("measurement-deterministic-upload").style.display = "none";
+                    document.getElementById("measurement-stochastic-upload").style.display = "none";
+
+                    if (selection === "deterministic") {
+                        document.getElementById("measurement-deterministic-upload").style.display = "block";
+                    } else if (selection === "stochastic") {
+                        document.getElementById("measurement-stochastic-upload").style.display = "block";
+                    }
+                }
+                    
+                function submitForms() {
+                    var formData = new FormData();
+                    var simulationOption = document.getElementById("simulation-options").value;
+                    var measurementOption = document.getElementById("measurement-options").value;
+
+                    if (simulationOption === "deterministic") {
+                        formData.append("mu_c", document.getElementById("mu_c").files[0]);
+                        formData.append("sigma_c", document.getElementById("sigma_c").files[0]);
+                    } else if (simulationOption === "stochastic") {
+                        formData.append("calc_sample", document.getElementById("calc_sample").files[0]);
+                    }
+
+                    if (measurementOption === "deterministic") {
+                        formData.append("mu_e", document.getElementById("mu_e").files[0]);
+                        formData.append("sigma_e", document.getElementById("sigma_e").files[0]);
+                    } else if (measurementOption === "stochastic") {
+                        formData.append("meas_sample", document.getElementById("meas_sample").files[0]);
+                    }
+                    
+                    document.getElementById('plot-image').src = '';
+                    document.getElementById('plot-image').style.display = 'none';
+                    $('#result-table-body').empty();
+
+                    $.ajax({
+                        url: '/process_sum',
+                        type: 'POST',
+                        data: formData,
+                        processData: false,
+                        contentType: false,
+                        success: function(response) {
+                            if (response.error) {
+                                alert(response.error);
+                            } else {
+                                $('#result-table-body').empty();
+
+                                if (response.plot_url) {
+                                    document.getElementById('plot-image').src = response.plot_url;
+                                    document.getElementById('plot-image').style.display = 'block';
+                                }
+
+                                const ckData = response.table_data[0];
+                                const jkData = response.table_data[1];
+                                const randData = response.table_data[2];
+
+                                let num_experiments = response.table_data[0].length;
+
+                                for (let i = 0; i < num_experiments; i++) {
+                                    $('#result-table-body').append(
+                                        '<tr>' +
+                                        '<td>' + ckData[i].experiment + '</td>' +  
+                                        '<td>' + ckData[i].pred_k + '</td>' +      
+                                        '<td>' + ckData[i].pred_u + '</td>' +      
+                                        '<td>' + jkData[i].pred_k + '</td>' +      
+                                        '<td>' + jkData[i].pred_u + '</td>' +      
+                                        '<td>' + randData[i].pred_k + '</td>' +    
+                                        '<td>' + randData[i].pred_u + '</td>' +    
+                                        '</tr>'
+                                    );
+                                }
+                                document.getElementById('download-graph-btn').style.display = 'inline-block';
+                                document.getElementById('download-data-btn').style.display = 'inline-block';
+                            }
+                        },
+                        error: function(xhr, status, error) {
+                            alert("An error occurred: " + error);
+                        }
+                    });
+                }
+                function downloadGraph() {
+                    window.location.href = '/download_graph';
+                }
+
+                function downloadData() {
+                    window.location.href = '/download_data';
+                }
+                </script>
+                       
+                <p id="e8d6c8f0-6916-4496-9b03-6390e2c16804" class=""></p>
+                <p id="result"></p> 
+                <br>
+                <button type="button" onclick="submitForms()">Upload and Process</button>
+                <br><br>
+
+                <hr id="68e9b9c4-8c30-4722-9eff-cccce4abc927" />
+                <p id="98dcf4c2-72d2-4785-8f85-74f28ae69a15" class=""></p>
+
+                <h2 id="afa7723d-0f4a-4933-939b-de819102a0d5" class="">Results</h2>
+                <br>
+
+                <img id="plot-image" src="" style="display:none; max-width:100%; height:auto;" alt="Plot">
+                <br>
+                <table id="result-table" border="1">
+                    <thead>
+                        <tr>
+                            <th></th>
+                            <th colspan="2">ck-ascending sorting</th>
+                            <th colspan="2">ck-descending sorting</th>
+                            <th colspan="2">optimal(jk) sorting</th>
+                        </tr>
+                        <tr>
+                            <th>Number of experiments</th>
+                            <th>pred_k</th>
+                            <th>pred_u</th>
+                            <th>pred_k</th>
+                            <th>pred_u</th>
+                            <th>pred_k</th>
+                            <th>pred_u</th>
+                        </tr>
+                    </thead>
+                    <tbody id="result-table-body">
+                        <!-- Rows will be appended here -->
+                    </tbody>
+                </table>
+                <br><br>
+                <button id="download-graph-btn" style="display:none;" type="button" onclick="downloadGraph()">Download Graph</button>
+                <button id="download-data-btn" style="display:none;" type="button" onclick="downloadData()">Download Data</button>
+
+                <div id="graphContainer"></div>
+            </div>
+        </article>
+        <span class="sans" style="font-size: 14px; padding-top: 2em"></span>
+    </div>
+    </body>
+</html>
