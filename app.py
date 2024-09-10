@@ -22,13 +22,15 @@ def load_data(files):
 def process_data(data):
     global mu_c
     global result
+    global jk_threshold
     mu_c = data.get('mu_c')
     sigma_c = data.get('sigma_c')
     mu_e = data.get('mu_e')
     sigma_e = data.get('sigma_e')
     meas_sample = data.get('meas_sample')
     calc_sample = data.get('calc_sample')
-    
+    jk_threshold = float(request.form.get('jk_threshold'))
+
     if mu_c is not None and mu_e is not None and sigma_c is not None and sigma_e is not None:
         result = jck_versus_num_exp(mu_c, mu_e, sigma_c, sigma_e)
     elif mu_c is not None and sigma_c is not None and meas_sample is not None:
@@ -172,13 +174,37 @@ def plot():
                     linestyle='-')
     ax4.set_title("optimal(jk) sorting")
     ax4.set_ylim(y_min, y_max)  # Set the y-axis limits
+    
+    jk_all = []
+    for j in range(len(methods)):
+        jk_temp = []
+        for i in range(1, len(mu_c)):
+            ratio = result[methods[j]]['pred_u'][i]/result[methods[j]]['pred_u'][0]
+            jk_temp.append(np.sqrt(1 - ratio**2))
+        jk_all.append(jk_temp)
 
+    k,u, ne,jk = [result[methods[0]]['pred_k'][0]],[result[methods[0]]['pred_u'][0]],[],[]
+    for i in range(3):
+        flag = True
+        j = 0
+        while flag:
+            if jk_all[i][j] >= jk_threshold:
+                k.append(result[methods[i]]['pred_k'][j+1])
+                u.append(result[methods[i]]['pred_u'][j+1])
+                jk.append(jk_all[i][j])
+                flag = False
+                ne.append(j+1)
+            j += 1
+    # print(ne)
+    clist = ["#1f77b4","#ff7f0e","#2ca02c"]
      # Pred_k plots
     ax5 = plt.subplot(gs[2, 0])
-    ax5.plot(num_exp, result[methods[0]]['pred_k'], label='ck-ascending')
-    ax5.plot(num_exp, result[methods[1]]['pred_k'], label='ck-descending')
-    ax5.plot(num_exp, result[methods[2]]['pred_k'], label='optimal(jk)')
-    ax5.set_title("Pred_k")
+    ax5.plot(num_exp, (result[methods[0]]['pred_k']-result[methods[0]]['pred_k'][0])*10**5, label='ck-ascending')
+    ax5.plot(num_exp, (result[methods[1]]['pred_k']-result[methods[0]]['pred_k'][0])*10**5, label='ck-descending')
+    ax5.plot(num_exp, (result[methods[2]]['pred_k']-result[methods[0]]['pred_k'][0])*10**5, label='optimal(jk)')
+    for i in range(3):
+        ax5.plot(ne[i]-1, (result[methods[i]]['pred_k'][ne[i]-1]-result[methods[0]]['pred_k'][0])*10**5, 'o', color=clist[i])
+    ax5.set_title("Application bias (pcm)")
     ax5.legend()
 
     # JK plots
@@ -186,15 +212,18 @@ def plot():
     ax6.plot(num_exp, result[methods[0]]['jk'], label='ck-ascending')
     ax6.plot(num_exp, result[methods[1]]['jk'], label='ck-descending')
     ax6.plot(num_exp, result[methods[2]]['jk'], label='optimal(jk)')
-    ax6.set_title("JK")
+    ax6.axhline(y = jk_threshold, linestyle='--', color='r', label='jk threshold')
+    ax6.set_title("jk")
     ax6.legend()
 
     # Pred_u plots
     ax7 = plt.subplot(gs[2, 2])
-    ax7.plot(num_exp, result[methods[0]]['pred_u'], label='ck-ascending')
-    ax7.plot(num_exp, result[methods[1]]['pred_u'], label='ck-descending')
-    ax7.plot(num_exp, result[methods[2]]['pred_u'], label='optimal(jk)')
-    ax7.set_title("Pred_u")
+    ax7.plot(num_exp, (result[methods[0]]['pred_u'])*10**5, label='ck-ascending')
+    ax7.plot(num_exp, (result[methods[1]]['pred_u'])*10**5, label='ck-descending')
+    ax7.plot(num_exp, (result[methods[2]]['pred_u'])*10**5, label='optimal(jk)')
+    for i in range(3):
+        ax7.plot(ne[i]-1, (result[methods[i]]['pred_u'][ne[i]-1])*10**5, 'o', color=clist[i])
+    ax7.set_title("Application uncertainty (pcm)")
     ax7.legend()
 
     plt.tight_layout(pad=2.0, h_pad=1.0, w_pad=1.0)
@@ -218,16 +247,16 @@ def download_graph():
 def download_data():
     output = io.StringIO()
     writer = csv.writer(output)
-
-    writer.writerow(['Number of experiments used','predicted k (ck)', 'predicted unc (ck)', 'predicted k (jk)', 'predicted unc (jk)', 'predicted k (rand)', 'predicted unc (rand)'])
-    num_rows = len(result['ck']['pred_k'])
+    writer.writerow(['','ck-ascending','','','ck-descending','','','jk (optimal)','',''])
+    writer.writerow(['Number of experiments used','pred. keff', 'pred. unc', 'culmul. jk','pred. keff', 'pred. unc', 'culmul. jk','pred. keff', 'pred. unc', 'culmul. jk'])
+    num_rows = len(result['ck-ascending']['pred_k'])
 
     for i in range(num_rows):
         row = [
             i,
-            result['ck-ascending']['pred_k'][i], result['ck-ascending']['pred_u'][i], 
-            result['ck-descending']['pred_k'][i], result['ck-descending']['pred_u'][i], 
-            result['optimal(jk)']['pred_k'][i], result['optimal(jk)']['pred_u'][i]
+            result['ck-ascending']['pred_k'][i], result['ck-ascending']['pred_u'][i], result['ck-ascending']['jk'][i],
+            result['ck-descending']['pred_k'][i], result['ck-descending']['pred_u'][i], result['ck-descending']['jk'][i], 
+            result['optimal(jk)']['pred_k'][i], result['optimal(jk)']['pred_u'][i], result['optimal(jk)']['jk'][i]
         ]
         writer.writerow(row)
 
