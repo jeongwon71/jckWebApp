@@ -54,13 +54,14 @@ def process_data(data):
     for method in ['ck-ascending','ck-descending','optimal(jk)']:
         pred_k = result[method]["pred_k"]
         pred_u = result[method]["pred_u"]
-        table_data.append([{"experiment": n, "pred_k": pk, "pred_u": ps} for n, pk, ps in zip(number_of_experiments, pred_k, pred_u)])
+        jk_values = result[method]["jk"]
+        table_data.append([{"experiment": n, "pred_k": pk, "pred_u": pu, "jk":jk_val} for n, pk, pu, jk_val in zip(number_of_experiments, pred_k, pred_u, jk_values)])
     # print(table_data)
     return {"table_data": table_data, "plot_url":"/plot"}
 
 @app.route('/', methods=['GET', 'POST'])
 def index():
-    with open('bnmkinf.txt', 'r') as file:
+    with open('bnmkinf2.txt', 'r') as file:
         items = [line.rstrip() for line in file.readlines()]
     return render_template('index.html', items=items)
 
@@ -106,7 +107,7 @@ def process_sum():
     data = load_data(files)
     response = process_data(data)
     return jsonify(response)
-
+    
 @app.route('/plot')
 def plot():
     global result
@@ -115,13 +116,14 @@ def plot():
 
     methods = ['ck-ascending','ck-descending','optimal(jk)']
 
-    plt.figure(figsize=(13, 10))
-    gs = gridspec.GridSpec(2, 3, height_ratios=[2, 1])  
+    plt.figure(figsize=(15, 15))
+    gs = gridspec.GridSpec(3, 3, height_ratios=[2, 1, 1])  
 
     ax1 = plt.subplot(gs[0, :])  
     ax1.set_title("Merged")
     lgd = [method+" order" for method in methods]
     num_exp = np.arange(len(result[methods[0]]['pred_k']))
+    
     for i in range(len(methods)):
         ax1.errorbar(num_exp - 0.3*(i-1), result[methods[i]]['pred_k'], yerr=result[methods[i]]['pred_u'],
                     fmt='s',
@@ -131,9 +133,11 @@ def plot():
                     markeredgewidth=1,
                     markeredgecolor='black',
                     linestyle='-')
-        ax1.legend(lgd)
+    ax1.legend(lgd)
+    
+    y_min, y_max = ax1.get_ylim()
 
-    ax2 = plt.subplot(gs[1, 0])  
+    ax2 = plt.subplot(gs[1, 0])
     ax2.errorbar(num_exp, result[methods[0]]['pred_k'], yerr=result[methods[0]]['pred_u'],
                     fmt='s',
                     capsize=5,
@@ -143,8 +147,9 @@ def plot():
                     markeredgecolor='black',
                     linestyle='-')
     ax2.set_title("ck-ascending sorting")
+    ax2.set_ylim(y_min, y_max)  # Set the y-axis limits
 
-    ax3 = plt.subplot(gs[1, 1])  
+    ax3 = plt.subplot(gs[1, 1])
     ax3.errorbar(num_exp, result[methods[1]]['pred_k'], yerr=result[methods[1]]['pred_u'],
                     fmt='s',
                     capsize=5,
@@ -154,8 +159,9 @@ def plot():
                     markeredgecolor='black',
                     linestyle='-')
     ax3.set_title("ck-descending sorting")
+    ax3.set_ylim(y_min, y_max)  # Set the y-axis limits
 
-    ax4 = plt.subplot(gs[1, 2])  
+    ax4 = plt.subplot(gs[1, 2])
     ax4.errorbar(num_exp, result[methods[2]]['pred_k'], yerr=result[methods[2]]['pred_u'],
                     fmt='s',
                     capsize=5,
@@ -165,14 +171,39 @@ def plot():
                     markeredgecolor='black',
                     linestyle='-')
     ax4.set_title("optimal(jk) sorting")
+    ax4.set_ylim(y_min, y_max)  # Set the y-axis limits
 
-    plt.tight_layout()
-    plt.show()
+     # Pred_k plots
+    ax5 = plt.subplot(gs[2, 0])
+    ax5.plot(num_exp, result[methods[0]]['pred_k'], label='ck-ascending')
+    ax5.plot(num_exp, result[methods[1]]['pred_k'], label='ck-descending')
+    ax5.plot(num_exp, result[methods[2]]['pred_k'], label='optimal(jk)')
+    ax5.set_title("Pred_k")
+    ax5.legend()
 
+    # JK plots
+    ax6 = plt.subplot(gs[2, 1])
+    ax6.plot(num_exp, result[methods[0]]['jk'], label='ck-ascending')
+    ax6.plot(num_exp, result[methods[1]]['jk'], label='ck-descending')
+    ax6.plot(num_exp, result[methods[2]]['jk'], label='optimal(jk)')
+    ax6.set_title("JK")
+    ax6.legend()
+
+    # Pred_u plots
+    ax7 = plt.subplot(gs[2, 2])
+    ax7.plot(num_exp, result[methods[0]]['pred_u'], label='ck-ascending')
+    ax7.plot(num_exp, result[methods[1]]['pred_u'], label='ck-descending')
+    ax7.plot(num_exp, result[methods[2]]['pred_u'], label='optimal(jk)')
+    ax7.set_title("Pred_u")
+    ax7.legend()
+
+    plt.tight_layout(pad=2.0, h_pad=1.0, w_pad=1.0)
+    
     img = io.BytesIO()
     plt.savefig(img, format='png')
     img.seek(0)
     return send_file(img, mimetype='image/png')
+
 
 @app.route('/download_graph')
 def download_graph():
@@ -225,7 +256,7 @@ def download_demo_Sig_e():
 
 @app.route("/download_demo_simul_sample")
 def download_demo_simul_sample():
-    path = 'demo_simul_sample.csv'
+    path = 'demo_calc_sample.csv'
     return send_file(path, as_attachment=True)
 
 @app.route("/download_demo_meas_sample")

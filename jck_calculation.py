@@ -17,20 +17,36 @@ def jck_versus_num_exp(mu_c, mu_e, Sig_c, Sig_e):
             idx = np.argsort(temp[-1,:-1])
             idx_ = np.concatenate((np.array([-1]),idx))
             results[method] = jck_calc(mu_c[idx_], Sig_c[idx_][:,idx_], mu_e[idx], Sig_e[idx][:,idx])
+            jk_temp = [0]
+            for i in range(1, len(mu_c)):
+                ratio = results[method]['pred_u'][i]/results[method]['pred_u'][0]
+                jk_temp.append(np.sqrt(1 - ratio**2))
+            results[method]['jk'] = jk_temp
+
         elif method == 'ck-descending':
             temp = np.linalg.inv(np.diag(np.sqrt(np.diag(Sig_c))))@Sig_c@np.linalg.inv(np.diag(np.sqrt(np.diag(Sig_c))))
             idx = np.argsort(temp[-1,:-1])
             idx = idx[::-1]
             idx_ = np.concatenate((np.array([-1]),idx))
-            print(idx_)
             results[method] = jck_calc(mu_c[idx_], Sig_c[idx_][:,idx_], mu_e[idx], Sig_e[idx][:,idx])
+            jk_temp = [0]
+            for i in range(1, len(mu_c)):
+                ratio = results[method]['pred_u'][i]/results[method]['pred_u'][0]
+                jk_temp.append(np.sqrt(1 - ratio**2))
+            results[method]['jk'] = jk_temp
+
         else:
             Sig_d = np.copy(Sig_c)
             Sig_d[:-1,:-1] += Sig_e
             temp = np.linalg.inv(np.diag(np.sqrt(np.diag(Sig_d))))@Sig_d@np.linalg.inv(np.diag(np.sqrt(np.diag(Sig_d))))
             idx = jck_idx_estimator(temp)
             idx_ = np.concatenate((np.array([-1]),idx))
-            print(idx_)
             results[method] = jck_calc(mu_c[idx_], Sig_c[idx_][:,idx_], mu_e[idx], Sig_e[idx][:,idx])
+            jk_temp = [0]
+            for i in range(1, len(mu_c)):
+                ratio = results[method]['pred_u'][i]/results[method]['pred_u'][0]
+                jk_temp.append(np.sqrt(1 - ratio**2))
+            results[method]['jk'] = jk_temp
+
     return results
 

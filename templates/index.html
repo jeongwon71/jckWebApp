@@ -24,10 +24,7 @@
                     color: rgb(55, 53, 47);
                 }
             }
-            #groupA {
-                font-family: "Courier New", Courier, monospace;
-                white-space: pre; /* Preserves spacing */
-            }
+            
             body {
                 font-size: 17px;
                 line-height: 1.5;
@@ -108,12 +105,16 @@
                 padding: 1.5em;
                 word-break: break-all;
             }
-
+            
+            .threshold-container {
+                margin-top: 10px;
+                /* display: none;  */
+            }
             .callout {
                 border-radius: 3px;
                 padding: 1rem;
             }
-
+            
             figure {
                 margin: 1.25em 0;
                 page-break-inside: avoid;
@@ -177,6 +178,10 @@
 
             .column:last-child {
                 padding-right: 0;
+            }
+            .table {
+                width: 100%; /* Make table take up full width of container */
+                border-collapse: collapse; /* Collapse borders between cells */
             }
 
             .table_of_contents-item {
@@ -431,13 +436,42 @@
             }
 
             .container {
-            width: 120%;
+            width: 100%;
             margin: 20px auto; 
             padding: 20px;
-            background-color: #185eb325; /* 흰 배경색 */
-            border: 1px solid #c0bbbb; /* 옅은 테두리 */
-            border-radius: 10px; /* 둥근 모서리 */
-            box-shadow: 0 4px 8px rgba(10, 9, 1, 0.393); /* 그림자 효과 */
+            background-color: #185eb325; 
+            border: 1px solid #c0bbbb; 
+            border-radius: 10px; 
+            box-shadow: 0 4px 8px rgba(10, 9, 1, 0.393); 
+            }
+            
+            
+            .subcontainer {
+                display: flex;
+                align-items: center;
+            }
+
+            .select-container {
+                display: flex;
+                align-items: center;
+            }
+
+            .button-container {
+                display: flex;
+                flex-direction: column;
+                justify-content: center;
+                align-items: center;
+                margin: 0 70px;
+            }
+            .action-button {
+                width: 180px; /* Same width for both buttons */
+                height: 50px; /* Same height for both buttons */
+                margin: 5px 0; /* Vertical margin for spacing between buttons */
+            }
+
+            select {
+                display: flex;
+                align-items: center;
             }
 
             .image {
@@ -835,7 +869,7 @@
             <div class="container"><div class="page-body" style="white-space: normal">
                 <h1 class="page-title">Performance Benchmark for jck Applications</h1>
                 <p class="page-description"></p>
-                <p id="c92940ef-1fea-4b39-8f2b-be52fb79e6db" class=""><b>Contact: Jeongwon Seo (seo71@purdue.edu)</b></p>
+                <p id="c92940ef-1fea-4b39-8f2b-be52fb79e6db" class=""><b>Contact: Jeongwon Seo (jeongwon.seo@austin.utexas.edu)</b></p>
                 <h3 id="163e996d-6683-4750-b0a2-63dc11a32cf7" class="">Objective</h3>
                 <p id="c92940ef-1fea-4b39-8f2b-be52fb79e6db" class="">
                     One of the most crucial aspects of model validation is conducting experiments that align with simulations 
@@ -950,26 +984,41 @@
                 <h2 id="afa7723d-0f4a-4933-939b-de819102a0d5" class="">Benchmark Data Generation from ICSBEP Handbook</h2>
                 
                 <p id="fed9338a-4436-4f46-84c2-fe4c8a590e9e" class="">
-                    In addition to the demo files, participants can download the necessary files by using the full set of 425 available critical benchmarks from the ICSBEP handbook. The benchmarks' information (simulation and measurement data) is provided below for participants to review and select. Additionally, the 'score' is specified, which is defined as the difference between the calculated and measured values divided by the square sum of their uncertainties. This score indicates whether the simulation results and the measurement data fall within the statistical distribution.
+                    In addition to the demo files, participants can download the necessary files by using the full set of 425 available critical benchmarks from the ICSBEP handbook. The benchmarks' information (simulation and measurement data) is provided below for participants to review and select. 
                 <br><br>
                 <form>
                     <label for="groupA">Select benchmarks for both Experiment(s) and Application (Ctrl or Shift to select multiple):</label><br>
-                    <select id="groupA" name="groupA[]" size="10" multiple>
-                        {% for item in items %}
-                            <option value="{{ loop.index0 }}">{{ item }}</option>
-                        {% endfor %}
-                    </select><br><br>
-                    
+                    <div class="subcontainer">
+                        <div class="select-container">
+                            <select id="groupA" name="groupA[]" size="10" multiple>
+                                {% for item in items %}
+                                    <option value="{{ loop.index0 }}">{{ item }}</option>
+                                {% endfor %}
+                            </select>
+                        </div>
+                        
+                        <div class="button-container">
+                            <button type="button" class="action-button" onclick="addItems()">>>&nbsp&nbsp&nbsp&nbsp Add &nbsp&nbsp</button>
+                            <button type="button" class="action-button" onclick="removeItems()">Remove <<</button>
+                        </div>
+                        
+                        <div class="select-container">
+                            <select id="groupB" name="groupB[]" size="10" multiple></select>
+                        </div>
+                    </div>
+                    <br>
+
                     Upon completion of selection, please click "Seleciton complete" button to further select Application<br>
-                    <button type="button" onclick="updateGroupB()">Selection complete</button><br><br>
+                    <button type="button" onclick="enableApplicationSelection()">Selection complete</button><br><br>
                     
-                    <label for="groupB">Select a single benchmark as Application:</label><br>
-                    <select id="groupB" name="groupB" disabled></select><br><br>
+                    <label for="appBenchmark">Select a single benchmark as Application:</label><br>
+                    <select id="appBenchmark" name="appBenchmark" disabled></select><br>
                     
-                    <button type="button" onclick="download_calc_keff()">Download Simulation keff</button>
-                    <button type="button" onclick="download_meas_keff()">Download Measurement keff</button>
-                    <button type="button" onclick="download_calc_cov()">Download Simulation Covariance</button>
-                    <button type="button" onclick="download_meas_cov()">Download Measurement Covariance</button>
+                    <p id="fed9338a-4436-4f46-84c2-fe4c8a590e9e" class=""> Download resulting files </p>
+                    <button type="button" onclick="download_calc_keff()">Simulation keff</button>
+                    <button type="button" onclick="download_meas_keff()">Measurement keff</button>
+                    <button type="button" onclick="download_calc_cov()">Simulation Covariance</button>
+                    <button type="button" onclick="download_meas_cov()">Measurement Covariance</button>
                 </form>
                 <br><br>
                 </p>
@@ -981,7 +1030,7 @@
                         <h3 id="8ee96f12-60ef-4123-aea1-4f9c48823235" class=""> Simulation information </h3>
                         <br>
                         <form id="simulation-form" method="post" enctype="multipart/form-data">
-                            <label for="simulation-options">Select an option:</label>
+                            <label for="simulation-options">Select a mode:</label>
                             <select id="simulation-options" name="simulation-options" onchange="showSimulationUploadFields()">
                                 <option value="">--Please choose an option--</option>
                                 <option value="deterministic">Deterministic</option>
@@ -1004,7 +1053,7 @@
                         <h3 id="68e54dc2-6eff-45b1-a2e7-2dc628dd9c7c" class=""> Measurement information </h3>
                         <br>
                         <form id="measurement-form" method="post" enctype="multipart/form-data">
-                            <label for="measurement-options">Select an option:</label>
+                            <label for="measurement-options">Select a mode:</label>
                             <select id="measurement-options" name="measurement-options" onchange="showMeasurementUploadFields()">
                                 <option value="">--Please choose an option--</option>
                                 <option value="deterministic">Deterministic</option>
@@ -1023,49 +1072,64 @@
                             
                         </form>
                     </div>
+                </div><br>
+                <h3>Set <i>j<sub>k</sub></i> threshold</h3>
+                <div class="threshold-container">
+                    <label for="jkThreshold">Please enter a value between 0.0 and 1.0: &nbsp&nbsp&nbsp</label>
+                    <input type="number" id="jkThreshold" name="jkThreshold" min="0" max="1" step="0.01" value="0.90">
                 </div>
+
                 <script>
-                    let selectedIndices = [];
-                    let selectedItems = [];
+                    function addItems() {
+                        let groupA = document.getElementById("groupA");
+                        let groupB = document.getElementById("groupB");
 
-                    function updateGroupB() {
-                        const groupASelect = document.getElementById('groupA');
-                        const selectedOptions = Array.from(groupASelect.selectedOptions);
+                        Array.from(groupA.selectedOptions).forEach(option => {
+                            groupB.appendChild(option);
+                        });
+                    }
 
-                        // Store selected indices and items from Group A
-                        selectedIndices = selectedOptions.map(option => parseInt(option.value));
-                        selectedItems = selectedOptions.map(option => option.text);  // Save the text of selected options
+                    function removeItems() {
+                        let groupB = document.getElementById("groupB");
 
-                        // Populate Group B options with selected Group A items
-                        const groupBSelect = document.getElementById('groupB');
-                        groupBSelect.innerHTML = ''; // Clear previous options
-
-                        selectedItems.forEach((item, index) => {
-                            const newOption = document.createElement('option');
-                            newOption.value = selectedIndices[index];  // Store the corresponding index as value
-                            newOption.text = item;  // Display the item text
-                            groupBSelect.add(newOption);
+                        Array.from(groupB.selectedOptions).forEach(option => {
+                            document.getElementById("groupA").appendChild(option);
+                        });
+                    }
+                    
+                    function enableApplicationSelection() {
+                        let groupB = document.getElementById("groupB");
+                        let appBenchmark = document.getElementById("appBenchmark");
+                        
+                        appBenchmark.innerHTML = ''; // Clear previous options
+                        Array.from(groupB.options).forEach(option => {
+                            let newOption = document.createElement("option");
+                            newOption.value = option.value;
+                            newOption.text = option.text;
+                            appBenchmark.appendChild(newOption);
                         });
 
-                        // Make sure that Group B is visible only if Group A has selected items
-                        if (selectedIndices.length > 0) {
-                            groupBSelect.disabled = false;
-                        }
+                        appBenchmark.disabled = false; // Enable the application select
                     }
 
                     function download_calc_keff() {
                         const groupBSelect = document.getElementById('groupB');
-                        selectedGroupBIndex = parseInt(groupBSelect.value);
+                        const appBenchmarkSelect = document.getElementById('appBenchmark');
+                        const allGroupBIndices = Array.from(groupBSelect.options).map(option => parseInt(option.value));
+                        const selectedAppBenchmarkIndex = appBenchmarkSelect.value ? parseInt(appBenchmarkSelect.value) : null;
 
-                        selectedIndices = selectedIndices.filter(index => index !== selectedGroupBIndex);
-                        selectedIndices.push(selectedGroupBIndex); // Group B index is added to the end
+                        let indicesToSend = [...allGroupBIndices];
+                        if (selectedAppBenchmarkIndex !== null) {
+                            indicesToSend = indicesToSend.filter(index => index !== selectedAppBenchmarkIndex); 
+                            indicesToSend.push(selectedAppBenchmarkIndex); 
+                        }
 
                         fetch('/download_calc_keff', {
                             method: 'POST',
                             headers: {
                                 'Content-Type': 'application/json',
                             },
-                            body: JSON.stringify({ indices: selectedIndices })
+                            body: JSON.stringify({ indices: indicesToSend })
                         })
                         .then(response => response.blob())
                         .then(blob => {
@@ -1079,27 +1143,32 @@
                         })
                         .catch(error => console.error('Error:', error));
                     }
-                
+
                     function download_meas_keff() {
                         const groupBSelect = document.getElementById('groupB');
-                        selectedGroupBIndex = parseInt(groupBSelect.value);
+                        const appBenchmarkSelect = document.getElementById('appBenchmark');
+                        const allGroupBIndices = Array.from(groupBSelect.options).map(option => parseInt(option.value));
+                        const selectedAppBenchmarkIndex = appBenchmarkSelect.value ? parseInt(appBenchmarkSelect.value) : null;
 
-                        selectedIndices = selectedIndices.filter(index => index !== selectedGroupBIndex);
-                        selectedIndices.push(selectedGroupBIndex); // Group B index is added to the end
+                        let indicesToSend = [...allGroupBIndices];
+                        if (selectedAppBenchmarkIndex !== null) {
+                            indicesToSend = indicesToSend.filter(index => index !== selectedAppBenchmarkIndex); // Remove selected index if present
+                            indicesToSend.push(selectedAppBenchmarkIndex); // Add it to the end
+                        }
 
                         fetch('/download_meas_keff', {
                             method: 'POST',
                             headers: {
                                 'Content-Type': 'application/json',
                             },
-                            body: JSON.stringify({ indices: selectedIndices })
+                            body: JSON.stringify({ indices: indicesToSend })
                         })
                         .then(response => response.blob())
                         .then(blob => {
                             const url = window.URL.createObjectURL(new Blob([blob]));
                             const a = document.createElement('a');
                             a.href = url;
-                            a.download = 'selected_meas_keff.csv';
+                            a.download = 'selected_meas_keff.csv'; // Name of the downloaded file
                             document.body.appendChild(a);
                             a.click();
                             a.remove();
@@ -1109,51 +1178,61 @@
 
                     function download_calc_cov() {
                         const groupBSelect = document.getElementById('groupB');
-                        selectedGroupBIndex = parseInt(groupBSelect.value);
+                        const appBenchmarkSelect = document.getElementById('appBenchmark');
+                        const allGroupBIndices = Array.from(groupBSelect.options).map(option => parseInt(option.value));
+                        const selectedAppBenchmarkIndex = appBenchmarkSelect.value ? parseInt(appBenchmarkSelect.value) : null;
 
-                        selectedIndices = selectedIndices.filter(index => index !== selectedGroupBIndex);
-                        selectedIndices.push(selectedGroupBIndex); 
+                        let indicesToSend = [...allGroupBIndices];
+                        if (selectedAppBenchmarkIndex !== null) {
+                            indicesToSend = indicesToSend.filter(index => index !== selectedAppBenchmarkIndex); // Remove selected index if present
+                            indicesToSend.push(selectedAppBenchmarkIndex); // Add it to the end
+                        }
 
                         fetch('/download_calc_cov', {
                             method: 'POST',
                             headers: {
                                 'Content-Type': 'application/json',
                             },
-                            body: JSON.stringify({ indices: selectedIndices })
+                            body: JSON.stringify({ indices: indicesToSend })
                         })
                         .then(response => response.blob())
                         .then(blob => {
                             const url = window.URL.createObjectURL(new Blob([blob]));
                             const a = document.createElement('a');
                             a.href = url;
-                            a.download = 'selected_calc_cov.csv';
+                            a.download = 'selected_calc_cov.csv'; // Name of the downloaded file
                             document.body.appendChild(a);
                             a.click();
                             a.remove();
                         })
                         .catch(error => console.error('Error:', error));
-                    }
+}
 
                     function download_meas_cov() {
                         const groupBSelect = document.getElementById('groupB');
-                        selectedGroupBIndex = parseInt(groupBSelect.value);
+                        const appBenchmarkSelect = document.getElementById('appBenchmark');
+                        const allGroupBIndices = Array.from(groupBSelect.options).map(option => parseInt(option.value));
+                        const selectedAppBenchmarkIndex = appBenchmarkSelect.value ? parseInt(appBenchmarkSelect.value) : null;
 
-                        selectedIndices = selectedIndices.filter(index => index !== selectedGroupBIndex);
-                        selectedIndices.push(selectedGroupBIndex); 
+                        let indicesToSend = [...allGroupBIndices];
+                        if (selectedAppBenchmarkIndex !== null) {
+                            indicesToSend = indicesToSend.filter(index => index !== selectedAppBenchmarkIndex); // Remove selected index if present
+                            indicesToSend.push(selectedAppBenchmarkIndex); // Add it to the end
+                        }
 
                         fetch('/download_meas_cov', {
                             method: 'POST',
                             headers: {
                                 'Content-Type': 'application/json',
                             },
-                            body: JSON.stringify({ indices: selectedIndices })
+                            body: JSON.stringify({ indices: indicesToSend })
                         })
                         .then(response => response.blob())
                         .then(blob => {
                             const url = window.URL.createObjectURL(new Blob([blob]));
                             const a = document.createElement('a');
                             a.href = url;
-                            a.download = 'selected_meas_cov.csv';
+                            a.download = 'selected_meas_cov.csv'; // Name of the downloaded file
                             document.body.appendChild(a);
                             a.click();
                             a.remove();
@@ -1189,6 +1268,7 @@
                     var formData = new FormData();
                     var simulationOption = document.getElementById("simulation-options").value;
                     var measurementOption = document.getElementById("measurement-options").value;
+                    var jkThreshold = document.getElementById("jkThreshold").value;
 
                     if (simulationOption === "deterministic") {
                         formData.append("mu_c", document.getElementById("mu_c").files[0]);
@@ -1204,6 +1284,13 @@
                         formData.append("meas_sample", document.getElementById("meas_sample").files[0]);
                     }
                     
+                    if (jkThreshold >= 0 && jkThreshold <= 1) {
+                        formData.append("jk_threshold", jkThreshold);
+                    } else {
+                        alert("Please enter a valid JK threshold between 0 and 1.");
+                        return; // Stop submission if invalid value is entered
+                    }
+
                     document.getElementById('plot-image').src = '';
                     document.getElementById('plot-image').style.display = 'none';
                     $('#result-table-body').empty();
@@ -1225,22 +1312,25 @@
                                     document.getElementById('plot-image').style.display = 'block';
                                 }
 
-                                const ckData = response.table_data[0];
-                                const jkData = response.table_data[1];
-                                const randData = response.table_data[2];
+                                const ckasc = response.table_data[0];
+                                const ckdes = response.table_data[1];
+                                const jkopt = response.table_data[2];
 
                                 let num_experiments = response.table_data[0].length;
 
                                 for (let i = 0; i < num_experiments; i++) {
                                     $('#result-table-body').append(
                                         '<tr>' +
-                                        '<td>' + ckData[i].experiment + '</td>' +  
-                                        '<td>' + ckData[i].pred_k + '</td>' +      
-                                        '<td>' + ckData[i].pred_u + '</td>' +      
-                                        '<td>' + jkData[i].pred_k + '</td>' +      
-                                        '<td>' + jkData[i].pred_u + '</td>' +      
-                                        '<td>' + randData[i].pred_k + '</td>' +    
-                                        '<td>' + randData[i].pred_u + '</td>' +    
+                                        '<td>' + ckasc[i].experiment + '</td>' +  
+                                        '<td>' + ckasc[i].pred_k.toFixed(6) + '</td>' +
+                                        '<td>' + ckasc[i].pred_u.toFixed(6) + '</td>' +
+                                        '<td>' + ckasc[i].jk.toFixed(6) + '</td>' +
+                                        '<td>' + ckdes[i].pred_k.toFixed(6) + '</td>' +      
+                                        '<td>' + ckdes[i].pred_u.toFixed(6) + '</td>' +      
+                                        '<td>' + ckdes[i].jk.toFixed(6) + '</td>' +
+                                        '<td>' + jkopt[i].pred_k.toFixed(6) + '</td>' +    
+                                        '<td>' + jkopt[i].pred_u.toFixed(6) + '</td>' +
+                                        '<td>' + jkopt[i].jk.toFixed(6) + '</td>' +
                                         '</tr>'
                                     );
                                 }
@@ -1276,22 +1366,25 @@
 
                 <img id="plot-image" src="" style="display:none; max-width:100%; height:auto;" alt="Plot">
                 <br>
-                <table id="result-table" border="1">
+                <table id="result-table" border="1" width="100%">
                     <thead>
                         <tr>
                             <th></th>
-                            <th colspan="2">ck-ascending sorting</th>
-                            <th colspan="2">ck-descending sorting</th>
-                            <th colspan="2">optimal(jk) sorting</th>
+                            <th colspan="3">ck-ascending sorting</th>
+                            <th colspan="3">ck-descending sorting</th>
+                            <th colspan="3">optimal(jk) sorting</th>
                         </tr>
                         <tr>
                             <th>Number of experiments</th>
-                            <th>pred_k</th>
-                            <th>pred_u</th>
-                            <th>pred_k</th>
-                            <th>pred_u</th>
-                            <th>pred_k</th>
-                            <th>pred_u</th>
+                            <th>pred. keff</th>
+                            <th>pred. unc</th>
+                            <th>cumul. jk</th>
+                            <th>pred. keff</th>
+                            <th>pred. unc</th>
+                            <th>cumul. jk</th>
+                            <th>pred. keff</th>
+                            <th>pred. unc</th>
+                            <th>cumul. jk</th>
                         </tr>
                     </thead>
                     <tbody id="result-table-body">
