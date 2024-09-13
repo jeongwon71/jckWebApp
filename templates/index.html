@@ -877,9 +877,9 @@
                     To reduce the associated costs and infer the additional information that new experiments might contribute to the application,
                     the ACCRUE index was previously proposed. Therefore, the objective of this project is to develop confidence 
                     in data assimilation (DA) techniques by employing three distinct sorting schemes. Experiments were sorted 
-                    in ascending and descending order using the ck metric, while the most recent methodology, jk, 
+                    in ascending and descending order using the <i>c<sub>k</sub></i> metric, while the most recent methodology, <i>j<sub>k</sub></i>, 
                     was used to achieve optimal sorting. The results obtained from experiments sorted by different methods 
-                    allow for a comparison between traditional ck-based sorting and the newer jk-based sorting approach.
+                    allow for a comparison between traditional <i>c<sub>k</sub></i>-based sorting and the newer <i>j<sub>k</sub></i>-based sorting approach.
                 </p><br>
                 <!-- <h3 id="e386931e-871c-4d1a-90dc-637d817a0096" class="">Scope</h3>
                 <p id="abb06fcb-f605-4460-bb4f-b19c514c5d0f" class="">
@@ -917,12 +917,14 @@
                     the updated application information is recorded. 
                     The final DA result, after all experiments have been utilized, is the same regardless of the sorting method. 
                     Hence, the data points at the last index of the graph and the last row of the table are identical 
-                    across all methods. The downloaded CSV file consists of six columns: 
-                    odd-numbered columns represent the keff mean, while even-numbered columns represent the keff uncertainty. 
-                    Columns 1 and 2 show the results from ck-ascending sorting, 
-                    where experiments are sorted from the smallest to the largest ck value; 
-                    columns 3 and 4 correspond to ck-descending sorting, the reverse order; 
-                    and finally, columns 5 and 6 correspond to optimal sorting using jk, as proposed in the ACCURE paper.
+                    across all methods. 
+                    The downloaded CSV file consists of 10 columns. The first column represents the Number of experiments used. If this number is 0, 
+                    it indicates the application's prior information. Therefore, regardless of the sorting method used, this value remains the same. 
+                    The cumulative <i>j<sub>k</sub></i> value is 0 when no experiments are used. If we divide the next 9 columns into 3 chunks, 
+                    the first 3 columns represent the results from <i>c<sub>k</sub></i>-ascending sorting where experiments are sorted 
+                    from the smallest to the largest <i>c<sub>k</sub></i> value; the next 3 columns are those from <i>c<sub>k</sub></i>-descending, 
+                    the reverse order; and the last 3 columns are from <i>j<sub>k</sub></i>-based optimal sorting. For each sorting method, the 3 columns record 
+                    the mean keff, prior/posterior uncertainty, and cumulative <i>j<sub>k</sub></i> value, respectively.
                 </p><br>
                 <br />
                 <hr id="68e9b9c4-8c30-4722-9eff-cccce4abc927" />
@@ -933,7 +935,7 @@
                         <li><b>File preparation</b></li>
                         Participants can prepare their data/files using one of the following methods:
                         <ol type="a">
-                            <li>Demo files - Information on 10 experiments and an application model from the ICSBEP handbook has been pre-saved. You can download the files by clicking the links in the 'Demo Files' section below.</li>
+                            <li>Demo files - Information on 72 experiments and an application model from the ICSBEP handbook has been pre-saved. You can download the files by clicking the links in the 'Demo Files' section below.</li>
                             <li>ICSBEP handbook benchmarks - Participants can select experiments and an application from a total of 425 critical benchmarks. After selecting all benchmarks for both the experiments and the application, click the 'Selection complete' button to choose one application from the selected benchmarks. Once the application is chosen, you can download the simulation keff mean, measurement keff mean, simulation keff covariance, and measurement keff covariance using the four buttons below. </li>
                             <li>Participants can prepare their own files/data. However, be mindful of the difference in data size between simulation and measurement information depending on whether an application is involved. For more information on file sizes, refer to the 'Description' section above.</li>
                         </ol>
@@ -956,7 +958,7 @@
                 
                 <p id="fed9338a-4436-4f46-84c2-fe4c8a590e9e" class="">
                     Demo files is provided for practice purpose. 
-                    The data includes 10 randomly selected experiments and one application from the ICSBEP handbook criticality benchmarks. 
+                    The data includes 72 randomly selected experiments and one application from the ICSBEP handbook criticality benchmarks. 
                     Both the simulation information and measurement information can be uploaded in either deterministic or stochastic mode (interchangeable). 
                     The number of samples used in the stochastic mode for both simulation and measurement modes is 10,000.
                 </p>
@@ -974,7 +976,7 @@
                         For Stochastic mode, 
                         <a href="{{url_for('download_demo_simul_sample')}}">simulation samples</a>, and
                         <a href="{{url_for('download_demo_meas_sample')}}">measurement samples</a>
-                        </li>
+                    </li>
                 </ul>
                 <br>
                 <p id="a9ec1659-8701-41ac-b5e2-42730ceb082b" class=""></p>
@@ -983,9 +985,17 @@
                 <p id="8fd2cd5d-0de4-4707-b37c-80edad8de392" class=""></p>
                 <h2 id="afa7723d-0f4a-4933-939b-de819102a0d5" class="">Benchmark Data Generation from ICSBEP Handbook</h2>
                 
-                <p id="fed9338a-4436-4f46-84c2-fe4c8a590e9e" class="">
-                    In addition to the demo files, participants can download the necessary files by using the full set of 425 available critical benchmarks from the ICSBEP handbook. The benchmarks' information (simulation and measurement data) is provided below for participants to review and select. 
-                <br><br>
+                <p id="fed9338a-4436-4f46-84c2-fe4c8a590e9e" class="">In addition to the demo files, participants can prepare and download files by using the full set of 425 available critical benchmarks from the ICSBEP handbook. The benchmarks' information (simulation and measurement data) is provided below for participants to review and select. <br>
+                    Follow the detailed instructions below: </p>
+                    <ol>
+                        <li>The left box below shows a full set of 425 available benchmarks. Use the ">>Add" and "Remove<<" buttons to select all the experiments and the application.</li>
+                        <li>Once the selection is complete, click the "Confirm Selection" button. A dropdown menu will be activated below this button, allowing you to select the application.</li>
+                        <li>Using the dropdown menu, select the application from the benchmarks you added in step 1.</li>
+                        <li>Use the download buttons below to save the information as CSV files.</li>
+                    </ol>
+                </p>
+
+                <br>
                 <form>
                     <label for="groupA">Select benchmarks for both Experiment(s) and Application (Ctrl or Shift to select multiple):</label><br>
                     <div class="subcontainer">
@@ -1009,7 +1019,7 @@
                     <br>
 
                     Upon completion of selection, please click "Seleciton complete" button to further select Application<br>
-                    <button type="button" onclick="enableApplicationSelection()">Selection complete</button><br><br>
+                    <button type="button" onclick="enableApplicationSelection()">Confirm Selection</button><br><br>
                     
                     <label for="appBenchmark">Select a single benchmark as Application:</label><br>
                     <select id="appBenchmark" name="appBenchmark" disabled></select><br>
@@ -1020,11 +1030,27 @@
                     <button type="button" onclick="download_calc_cov()">Simulation Covariance</button>
                     <button type="button" onclick="download_meas_cov()">Measurement Covariance</button>
                 </form>
-                <br><br>
+                <br>
                 </p>
 
                 <hr id="68e9b9c4-8c30-4722-9eff-cccce4abc927" />
                 <h2 id="afa7723d-0f4a-4933-939b-de819102a0d5" class="">Upload CSV File</h2>
+
+                <p id="fed9338a-4436-4f46-84c2-fe4c8a590e9e" class=""> To upload and process the GLLSM DA calculation, follow the detailed instructions below: </p>
+                    <ol>
+                        <li>Use the dropdown menus under "Simulation information" and "Measurement information" to choose between deterministic and stochastic modes. 
+                            If deterministic mode is selected, upload two csv files corresponding to the mean vector and covariance matrix. 
+                            If stochastic mode is selected, upload a csv file containing the samples.</li>
+                        <li>Set an appropriate target <i>j<sub>k</sub></i> threshold. If the set <i>j<sub>k</sub></i> threshold is smaller than the total cumulative <i>j<sub>k</sub></i>
+                             value that can be calculated from all selected experiments, it will be ignored in the graph.</li>
+                        <li>Click the "Upload and Process" button to generate graph and data table.</li>
+                    </ol>
+                </p>
+
+                <!-- <p id="fed9338a-4436-4f46-84c2-fe4c8a590e9e" class=""> This part is to ... </p>
+                <li>File preparation</li>
+                <li>File preparation</li>
+                <li>File preparation</li> -->
                 <div id="2509fd8d-3a2a-46d1-9d76-77351161bb13" class="column-list">
                     <div id="dfd28b4b-8734-445d-96ac-7c0fe2efa832" style="width: 50%" class="column">
                         <h3 id="8ee96f12-60ef-4123-aea1-4f9c48823235" class=""> Simulation information </h3>
@@ -1072,7 +1098,7 @@
                             
                         </form>
                     </div>
-                </div><br>
+                </div>
                 <h3>Set <i>j<sub>k</sub></i> threshold</h3>
                 <div class="threshold-container">
                     <label for="jkThreshold">Please enter a value between 0.0 and 1.0: &nbsp&nbsp&nbsp</label>
@@ -1288,7 +1314,7 @@
                         formData.append("jk_threshold", jkThreshold);
                     } else {
                         alert("Please enter a valid JK threshold between 0 and 1.");
-                        return; // Stop submission if invalid value is entered
+                        return; 
                     }
 
                     document.getElementById('plot-image').src = '';

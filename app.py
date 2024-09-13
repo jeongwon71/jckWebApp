@@ -182,28 +182,27 @@ def plot():
             ratio = result[methods[j]]['pred_u'][i]/result[methods[j]]['pred_u'][0]
             jk_temp.append(np.sqrt(1 - ratio**2))
         jk_all.append(jk_temp)
+    # print(jk_all)
 
     k,u, ne,jk = [result[methods[0]]['pred_k'][0]],[result[methods[0]]['pred_u'][0]],[],[]
     for i in range(3):
-        flag = True
-        j = 0
-        while flag:
-            if jk_all[i][j] >= jk_threshold:
-                k.append(result[methods[i]]['pred_k'][j+1])
-                u.append(result[methods[i]]['pred_u'][j+1])
-                jk.append(jk_all[i][j])
-                flag = False
-                ne.append(j+1)
-            j += 1
-    # print(ne)
+        for jj in range(1, len(result[methods[i]]['pred_k'])):
+            if jk_all[i][jj] >= jk_threshold:
+                k.append(result[methods[i]]['pred_k'][jj])
+                u.append(result[methods[i]]['pred_u'][jj])
+                jk.append(jk_all[i][jj])
+                ne.append(jj+1)
+                break
+    print(ne)
     clist = ["#1f77b4","#ff7f0e","#2ca02c"]
      # Pred_k plots
     ax5 = plt.subplot(gs[2, 0])
     ax5.plot(num_exp, (result[methods[0]]['pred_k']-result[methods[0]]['pred_k'][0])*10**5, label='ck-ascending')
     ax5.plot(num_exp, (result[methods[1]]['pred_k']-result[methods[0]]['pred_k'][0])*10**5, label='ck-descending')
     ax5.plot(num_exp, (result[methods[2]]['pred_k']-result[methods[0]]['pred_k'][0])*10**5, label='optimal(jk)')
-    for i in range(3):
-        ax5.plot(ne[i]-1, (result[methods[i]]['pred_k'][ne[i]-1]-result[methods[0]]['pred_k'][0])*10**5, 'o', color=clist[i])
+    if ne:
+        for i in range(3):
+            ax5.plot(ne[i]-1, (result[methods[i]]['pred_k'][ne[i]-1]-result[methods[0]]['pred_k'][0])*10**5, 'o', color=clist[i])
     ax5.set_title("Application bias (pcm)")
     ax5.legend()
 
@@ -212,7 +211,7 @@ def plot():
     ax6.plot(num_exp, result[methods[0]]['jk'], label='ck-ascending')
     ax6.plot(num_exp, result[methods[1]]['jk'], label='ck-descending')
     ax6.plot(num_exp, result[methods[2]]['jk'], label='optimal(jk)')
-    ax6.axhline(y = jk_threshold, linestyle='--', color='r', label='jk threshold')
+    if ne: ax6.axhline(y = jk_threshold, linestyle='--', color='r', label='jk threshold')
     ax6.set_title("jk")
     ax6.legend()
 
@@ -221,8 +220,9 @@ def plot():
     ax7.plot(num_exp, (result[methods[0]]['pred_u'])*10**5, label='ck-ascending')
     ax7.plot(num_exp, (result[methods[1]]['pred_u'])*10**5, label='ck-descending')
     ax7.plot(num_exp, (result[methods[2]]['pred_u'])*10**5, label='optimal(jk)')
-    for i in range(3):
-        ax7.plot(ne[i]-1, (result[methods[i]]['pred_u'][ne[i]-1])*10**5, 'o', color=clist[i])
+    if ne:
+        for i in range(3):
+            ax7.plot(ne[i]-1, (result[methods[i]]['pred_u'][ne[i]-1])*10**5, 'o', color=clist[i])
     ax7.set_title("Application uncertainty (pcm)")
     ax7.legend()
 
